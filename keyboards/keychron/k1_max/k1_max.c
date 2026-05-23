@@ -23,9 +23,16 @@ static uint32_t power_on_indicator_timer;
 pin_t bt_led_pins[] = BT_INDICATION_LED_PIN_LIST;
 #endif
 
+// Weak default: keymaps that don't override get stock behavior
+// (Mac → layer 0, Win → layer 2). Our colemak keymap defines a strong
+// version of this function to repurpose the switch as a Colemak ON/OFF.
+__attribute__((weak)) void on_mac_windows_switch(bool active) {
+    default_layer_set(1UL << (active ? 0 : 2));
+}
+
 bool dip_switch_update_kb(uint8_t index, bool active) {
     if (index == 0) {
-        default_layer_set(1UL << (active ? 0 : 2));
+        on_mac_windows_switch(active);
     }
     dip_switch_update_user(index, active);
 

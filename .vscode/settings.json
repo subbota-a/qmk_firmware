@@ -6,7 +6,7 @@
     "files.exclude": {
         "**/.build": true,
         "**/*.hex": true,
-        "**/*.bin": true,
+        "**/*.bin": false,
         "**/*.uf2": true
     },
     "files.associations": {
@@ -53,5 +53,8 @@
             "fileMatch": ["keymap.json"],
             "url": "./data/schemas/keymap.jsonschema"
         }
+    ],
+    "cSpell.words": [
+        "COLEMAK"
     ]
 }
