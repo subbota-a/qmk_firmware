@@ -1,3 +1,43 @@
+# My fork — K1 Max build & flash
+
+Personal fork. My custom keymap is `keychron/k1_max/ansi/rgb:keychron`
+(Colemak-DH overlay, see [its README](keyboards/keychron/k1_max/ansi/rgb/keymaps/keychron/README.md)).
+This section is my own workflow; the original Keychron readme follows below.
+
+## 1. Build (Docker — no local toolchain)
+
+```sh
+./util/docker_build.sh keychron/k1_max/ansi/rgb:keychron
+```
+
+`util/docker_build.sh` runs `make` inside the `qmk_cli` container with
+`SKIP_FLASHING_SUPPORT=1` (compile only, no privileged `/dev` mount) and
+`QMK_USERSPACE=` (skips the "copy to userspace folder" step that otherwise
+fails on the unmounted `/qmk_userspace`). The firmware lands in the repo root as
+`keychron_k1_max_ansi_rgb_keychron.bin`.
+
+## 2. Enter the bootloader (DFU)
+
+1. Set the side mode switch to **"Cable"** (wired — 2.4G/BT will not flash).
+2. Hold **Esc** (or the reset button under the spacebar)…
+3. …while plugging in the USB cable. Release.
+
+The board appears as USB device `0483:df11` (STM32 DFU). Verify with
+`sudo dfu-util -l` — `sudo` is required, otherwise `LIBUSB_ERROR_ACCESS`.
+
+## 3. Flash
+
+```sh
+sudo dfu-util -d 0483:df11 -a 0 -s 0x08000000:leave -D keychron_k1_max_ansi_rgb_keychron.bin
+```
+
+`-d` VID:PID of the DFU device · `-a 0` Internal Flash · `-s 0x08000000:leave`
+STM32 flash base, exit DFU and boot after · `-D` download the `.bin`. Same
+command as `restore.sh`, just our build instead of the stock backup — run
+`restore.sh` to roll back to factory firmware.
+
+---
+
 # Keychron QMK Firmware
 
 [![Star this repo](https://img.shields.io/github/stars/Keychron/qmk_firmware?style=social&label=Star%20this%20repo)](https://github.com/Keychron/qmk_firmware)
